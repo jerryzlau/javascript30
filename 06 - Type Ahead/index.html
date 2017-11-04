@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Type Ahead 👀</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <form class="search-form">
+    <input type="text" class="search" placeholder="City or State">
+    <ul class="suggestions">
+      <li>Filter for a city</li>
+      <li>or a state</li>
+    </ul>
+  </form>
+
+<script>
+  const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+  const cities = [];
+
+  // this is the ajax call 
+  fetch(endpoint).then(res => res.json())
+                 // push in each entry into the array 
+                 .then(data => cities.push(...data));
+  
+  // filter wanted elements
+  function findMatches(wordToMatch, cities){
+    return cities.filter(place => {
+      // Regex syntax: 
+      // g: global match; find all matches rather than stopping after the first match
+      // i: case-insensitive
+      const regex = new RegExp(wordToMatch, 'gi');
+      return place.city.match(regex) || place.state.match(regex);
+    });
+  };
+
+  // put commas in numbers
+  function numberWithCommas(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  // display function
+  function displayMatches(){
+    const filtered = findMatches(this.value, cities);
+    const list = filtered.map(place => {
+      const regex = new RegExp(this.value, 'gi');
+
+      // Add highlight to city name 
+      const cityName = place.city.replace(regex, 
+            `<span class="hl">${this.value}</span>`
+      );
+
+      // Add highlight to state name
+      const stateName = place.state.replace(regex, 
+            `<span class="hl">${this.value}</span>`
+      );
+
+      // Add comma to population
+      const population = numberWithCommas(place.population);
+
+      return `
+        <li>
+          <span class="name">${cityName}, ${stateName}</span>
+          <span class="population">${population}</span>
+        </li>
+      `;
+    }).join('');
+
+    suggestions.innerHTML = list;
+  }
+
+  // grab searchinput tag and addEventListener
+  const searchInput = document.querySelector('.search');
+  const suggestions = document.querySelector('.suggestions');
+  searchInput.addEventListener('change', displayMatches);
+  searchInput.addEventListener('keyup', displayMatches);
+
+</script>
+
+  </body>
+</html>
