@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JS Reference VS Copy</title>
+</head>
+<body>
+
+  <script>
+    // start with strings, numbers and booleans
+    let age = 100;
+    let age2 = age;
+    console.log(age, age2);
+    age = 200;
+    // age2 stays the same because now age points to 200 but age2 was 
+    // already assigned to point to 100
+    console.log(age, age2);
+
+    // Let's say we have an array
+    const players = ['Wes', 'Sarah', 'Ryan', 'Poppy'];
+
+    // and we want to make a copy of it.
+
+    const team = players;
+    console.log(players, team);
+
+    // You might think we can just do something like this:
+    team[3] = 'Jerry';
+    // this changes the players array too because it's only changing reference
+    console.log(players, team);
+
+    // however what happens when we update that array?
+
+    // now here is the problem!
+
+    // oh no - we have edited the original array too!
+
+    // Why? It's because that is an array reference, not an array copy. They both point to the same array!
+
+    // So, how do we fix this? We take a copy instead!
+    // if slice is not given argument, returns a copy of the array
+    const team2 = players.slice();
+    team[1] = 'Maple';
+    console.log(team2, team);
+
+    // one way
+
+    // or create a new array and concat the old one in
+    const team3 = [].concat(players);
+    // or use the new ES6 Spread
+    const team4 = [...players];
+
+    const team5 = Array.from(players);
+
+    // now when we update it, the original one isn't changed
+
+    // The same thing goes for objects, let's say we have a person object
+
+    // with Objects
+    const person = {
+      name: 'Jerry Lau',
+      age: 23
+    }
+
+    // and think we make a copy:
+    const captain = person;
+
+    // how do we take a copy instead?
+    const captain2 = Object.assign({}, person, {number: 30});
+    console.log(captain, captain2);
+
+    // We will hopefully soon see the object ...spread
+    // const captain3 = {...person};
+
+    // Things to note - this is only 1 level deep - both for Arrays and Objects. lodash has a cloneDeep method, but you should think twice before using it.
+    // shallow dup only goes one level deep, it doesn't deal with nested objects or arrays
+    // quick way to do deep dup, translate json to string and then back to json
+    JSON.parse(JSON.stringify(person));
+  </script>
+
+</body>
+</html>
